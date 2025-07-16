@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Admin Panel</h1>
+        <div id="loginContainer">
+            <h2>Log Masuk Admin</h2>
+            <input type="password" id="password" placeholder="Kata Laluan">
+            <button id="loginBtn">Log Masuk</button>
+        </div>
+        <div id="adminPanel" style="display: none;">
+            <h2>Tambah/Edit Data Kenderaan</h2>
+            <form id="vehicleForm">
+                <input type="text" id="noKenderaan" placeholder="No Kenderaan" required>
+                <input type="text" id="jenisKenderaan" placeholder="Jenis Kenderaan" required>
+                <input type="text" id="noUnitBlok" placeholder="No Unit / Blok" required>
+                <select id="statusOwner" required>
+                    <option value="Tuan Rumah">Tuan Rumah</option>
+                    <option value="Penyewa">Penyewa</option>
+                </select>
+                <input type="text" id="noSiriStiker" placeholder="No Siri Stiker" required>
+                <input type="date" id="tarikhKeluarStiker" required>
+                <input type="text" id="tempohStiker" placeholder="Tempoh Stiker (bulan/tahun)" required>
+                <input type="text" id="noFon" placeholder="No Fon" required>
+                <input type="text" id="contactPerson" placeholder="2nd Contact">
+                <input type="text" id="noFonContactPerson" placeholder="No Fon 2nd Contact">
+                <input type="text" id="yuranMaintenance" placeholder="Yuran Maintenance (RM)">
+                <textarea id="catatan" placeholder="Catatan"></textarea>
+                <button type="submit">Tambah/Kemaskini Data</button>
+            </form>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
