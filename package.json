@@ -1,0 +1,33 @@
+{
+  "dependencies": {
+    "jest": "^30.0.5",
+    "puppeteer": "^24.15.0",
+    "vercel": "^44.6.4"
+  },
+  "name": "app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "api.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "jest"
+  },
+  "jest": {
+    "moduleDirectories": [
+      "node_modules",
+      "."
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/azamyusof/AzamDgreat.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/azamyusof/AzamDgreat/issues"
+  },
+  "homepage": "https://github.com/azamyusof/AzamDgreat#readme"
+}
