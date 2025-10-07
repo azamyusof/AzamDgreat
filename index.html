@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rekod Kesihatan</title>
+    <style>
+        /* CSS Variables for theming */
+        :root {
+            --primary-color: #ffffff;
+            --secondary-color: #f4f4f4;
+            --font-color: #333333;
+            --border-color: #dddddd;
+            --header-bg: #eeeeee;
+            --button-bg: #d4d4d4;
+            --button-hover-bg: #c0c0c0;
+            --accent-color: #3498db;
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #1a202c; /* Dark Blueish */
+            --secondary-color: #2d3748; /* Darker Blueish */
+            --font-color: #e2e8f0;
+            --border-color: #4a5568;
+            --header-bg: #2d3748;
+            --button-bg: #c53030; /* Red */
+            --button-hover-bg: #9b2c2c;
+            --accent-color: #22543d; /* Dark Green */
+        }
+
+        /* General Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--primary-color);
+            color: var(--font-color);
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--header-bg);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+        }
+
+        button, input[type="submit"] {
+            background-color: var(--button-bg);
+            color: var(--font-color);
+            border: 1px solid var(--border-color);
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover, input[type="submit"]:hover {
+            background-color: var(--button-hover-bg);
+        }
+
+        /* Main App Sections */
+        .app-section {
+            display: none; /* Hidden by default */
+            background-color: var(--secondary-color);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .app-section.active {
+            display: block; /* Show active section */
+        }
+
+        /* User List */
+        #user-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .user-card {
+            background-color: var(--primary-color);
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .user-card:hover {
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-left: 5px solid var(--accent-color);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--primary-color);
+            color: var(--font-color);
+        }
+
+        /* Tabs */
+        .tab-nav {
+            display: flex;
+            flex-wrap: wrap;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .tab-link {
+            padding: 10px 15px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-bottom: none;
+            margin-right: 5px;
+            border-radius: 5px 5px 0 0;
+        }
+
+        .tab-link.active {
+            background-color: var(--secondary-color);
+            border-color: var(--border-color);
+            font-weight: bold;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Rekod Kesihatan</h1>
+            <div>
+                <button id="settings-btn">⚙️ Tetapan</button>
+                <button id="theme-switcher">Tukar Tema</button>
+            </div>
+        </header>
+
+        <main>
+            <!-- Main Dashboard: User List -->
+            <section id="main-dashboard" class="app-section active">
+                <h2>Senarai Pengguna</h2>
+                <div id="user-list">
+                    <!-- User cards will be dynamically inserted here -->
+                    <p>Tiada pengguna didaftarkan. Sila ke 'Tetapan' untuk menambah pengguna.</p>
+                </div>
+            </section>
+
+            <!-- Settings: User Registration -->
+            <section id="settings-section" class="app-section">
+                <button id="back-to-main-btn">← Kembali ke Dashboard</button>
+                <h2>Daftar Pengguna Baru</h2>
+                <form id="add-user-form">
+                    <div class="form-group">
+                        <label for="user-name">Nama Penuh</label>
+                        <input type="text" id="user-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="user-dob">Tarikh Lahir</label>
+                        <input type="date" id="user-dob" required>
+                        <small>Umur: <span id="user-age">_</span></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="user-blood-type">Jenis Darah</label>
+                        <select id="user-blood-type">
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                            <option value="Tidak Diketahui">Tidak Diketahui</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="user-gender">Jantina</label>
+                        <select id="user-gender">
+                            <option value="Lelaki">Lelaki</option>
+                            <option value="Perempuan">Perempuan</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="user-height">Tinggi (cm)</label>
+                        <input type="number" id="user-height" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="user-weight">Berat (kg)</label>
+                        <input type="number" id="user-weight" required>
+                        <small>BMI: <span id="user-bmi">_</span> | Tahap: <span id="user-bmi-status">_</span></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="user-allergies">Alahan (jika ada)</label>
+                        <textarea id="user-allergies" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="user-notes">Nota Tambahan</label>
+                        <textarea id="user-notes" rows="3"></textarea>
+                    </div>
+                    <input type="submit" value="Daftar Pengguna">
+                </form>
+            </section>
+
+            <!-- User Specific Health Records -->
+            <section id="user-records-section" class="app-section">
+                 <button id="back-to-main-from-records-btn">← Kembali ke Dashboard</button>
+                <h2 id="user-records-title">Rekod untuk [Nama Pengguna]</h2>
+                <div class="tab-nav">
+                    <!-- Tab links will be dynamically inserted here -->
+                </div>
+                <div id="tab-content-container">
+                    <!-- Tab content will be dynamically inserted here -->
+                </div>
+            </section>
+
+            <!-- Summary Dashboard -->
+            <section id="summary-dashboard" class="app-section">
+                 <button id="back-to-main-from-summary-btn">← Kembali ke Dashboard</button>
+                 <h2>Ringkasan Kesihatan</h2>
+                 <!-- Content for summary -->
+            </section>
+
+            <!-- Calendar -->
+            <section id="calendar-section" class="app-section">
+                 <button id="back-to-main-from-calendar-btn">← Kembali ke Dashboard</button>
+                 <h2>Kalendar</h2>
+                 <!-- Content for calendar -->
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- STATE MANAGEMENT ---
+            let users = []; // Main array to hold user objects
+
+            // --- DOM ELEMENTS ---
+            const themeSwitcher = document.getElementById('theme-switcher');
+            const settingsBtn = document.getElementById('settings-btn');
+            const backToMainBtn = document.getElementById('back-to-main-btn');
+            const addUserForm = document.getElementById('add-user-form');
+            const userListDiv = document.getElementById('user-list');
+
+            // Form fields
+            const userNameInput = document.getElementById('user-name');
+            const userDobInput = document.getElementById('user-dob');
+            const userAgeSpan = document.getElementById('user-age');
+            const userHeightInput = document.getElementById('user-height');
+            const userWeightInput = document.getElementById('user-weight');
+            const userBmiSpan = document.getElementById('user-bmi');
+            const userBmiStatusSpan = document.getElementById('user-bmi-status');
+
+            // --- FUNCTIONS ---
+
+            // Navigation
+            function showSection(sectionId) {
+                document.querySelectorAll('.app-section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                document.getElementById(sectionId).classList.add('active');
+            }
+
+            // Calculations
+            function calculateAge(dobString) {
+                const dob = new Date(dobString);
+                const diff_ms = Date.now() - dob.getTime();
+                const age_dt = new Date(diff_ms);
+                return Math.abs(age_dt.getUTCFullYear() - 1970);
+            }
+
+            function calculateBMI() {
+                const height = parseFloat(userHeightInput.value);
+                const weight = parseFloat(userWeightInput.value);
+                if (height > 0 && weight > 0) {
+                    const heightInMeters = height / 100;
+                    const bmi = weight / (heightInMeters * heightInMeters);
+                    const bmiRounded = bmi.toFixed(2);
+                    userBmiSpan.textContent = bmiRounded;
+
+                    let status = "Tidak Diketahui";
+                    if (bmi < 18.5) status = "Kurang Berat Badan";
+                    else if (bmi >= 18.5 && bmi <= 24.9) status = "Normal";
+                    else if (bmi >= 25 && bmi <= 29.9) status = "Lebih Berat Badan";
+                    else if (bmi >= 30) status = "Obesiti";
+                    userBmiStatusSpan.textContent = status;
+                } else {
+                    userBmiSpan.textContent = "_";
+                    userBmiStatusSpan.textContent = "_";
+                }
+            }
+
+            // UI Rendering
+            function renderUsers() {
+                userListDiv.innerHTML = ''; // Clear existing list
+                if (users.length === 0) {
+                    userListDiv.innerHTML = '<p>Tiada pengguna didaftarkan. Sila ke \'Tetapan\' untuk menambah pengguna.</p>';
+                    return;
+                }
+                users.forEach(user => {
+                    const userCard = document.createElement('div');
+                    userCard.className = 'user-card';
+                    userCard.textContent = user.name;
+                    userCard.dataset.userName = user.name; // Store name for later retrieval
+                    userListDiv.appendChild(userCard);
+                });
+            }
+
+            // Event Handlers
+            function handleUserFormSubmit(event) {
+                event.preventDefault();
+                const name = userNameInput.value.trim();
+
+                // Validation
+                if (users.length >= 20) {
+                    alert("Had maksimum 20 pengguna telah dicapai.");
+                    return;
+                }
+                if (users.some(user => user.name.toLowerCase() === name.toLowerCase())) {
+                    alert("Nama pengguna telah wujud. Sila gunakan nama lain.");
+                    return;
+                }
+
+                const newUser = {
+                    id: 'user_' + Date.now(), // Simple unique ID
+                    name: name,
+                    dob: document.getElementById('user-dob').value,
+                    bloodType: document.getElementById('user-blood-type').value,
+                    gender: document.getElementById('user-gender').value,
+                    height: document.getElementById('user-height').value,
+                    weight: document.getElementById('user-weight').value,
+                    allergies: document.getElementById('user-allergies').value,
+                    notes: document.getElementById('user-notes').value,
+                    healthRecords: {} // To store health data later
+                };
+
+                users.push(newUser);
+                renderUsers();
+                addUserForm.reset(); // Clear form fields
+                showSection('main-dashboard'); // Go back to main view
+            }
+
+            // --- EVENT LISTENERS ---
+
+            // Theme switcher
+            themeSwitcher.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                document.documentElement.setAttribute('data-theme', currentTheme === 'dark' ? '' : 'dark');
+            });
+
+            // Navigation
+            settingsBtn.addEventListener('click', () => showSection('settings-section'));
+            backToMainBtn.addEventListener('click', () => showSection('main-dashboard'));
+            document.getElementById('back-to-main-from-records-btn').addEventListener('click', () => showSection('main-dashboard'));
+            document.getElementById('back-to-main-from-summary-btn').addEventListener('click', () => showSection('main-dashboard'));
+            document.getElementById('back-to-main-from-calendar-btn').addEventListener('click', () => showSection('main-dashboard'));
+
+            // Form interactions
+            addUserForm.addEventListener('submit', handleUserFormSubmit);
+            userDobInput.addEventListener('change', () => {
+                userAgeSpan.textContent = calculateAge(userDobInput.value) || '_';
+            });
+            userHeightInput.addEventListener('input', calculateBMI);
+            userWeightInput.addEventListener('input', calculateBMI);
+
+            // --- INITIALIZATION ---
+            renderUsers(); // Initial render
+        });
+    </script>
+</body>
+</html>
