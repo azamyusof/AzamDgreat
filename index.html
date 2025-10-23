@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown App</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        #main-display {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #countdown-list {
+            margin-bottom: 20px;
+        }
+
+        .countdown-item {
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        #settings {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        .flashing-yellow {
+            animation: flash-yellow 1s infinite;
+        }
+
+        .flashing-amber {
+            animation: flash-amber 1s infinite;
+        }
+
+        .flashing-red {
+            animation: flash-red 1s infinite;
+        }
+
+        @keyframes flash-yellow {
+            0% { background-color: #fff; }
+            50% { background-color: #ffc; }
+            100% { background-color: #fff; }
+        }
+
+        @keyframes flash-amber {
+            0% { background-color: #fff; }
+            50% { background-color: #ffb; }
+            100% { background-color: #fff; }
+        }
+
+        @keyframes flash-red {
+            0% { background-color: #fff; }
+            50% { background-color: #fbb; }
+            100% { background-color: #fff; }
+        }
+    </style>
+</head>
+<body>
+    <div id="main-display">
+        <h1 id="current-date"></h1>
+        <h2 id="current-day"></h2>
+    </div>
+
+    <div id="countdown-list">
+        <!-- Countdown items will be dynamically inserted here -->
+    </div>
+
+    <div id="settings">
+        <h2>Settings</h2>
+        <div id="countdown-form">
+            <input type="text" id="countdown-title" placeholder="Countdown Title">
+            <input type="date" id="countdown-date">
+            <button id="add-countdown">Add Countdown</button>
+        </div>
+        <div id="countdown-settings-list">
+            <!-- Countdown settings will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <script>
+        const currentDateElement = document.getElementById('current-date');
+        const currentDayElement = document.getElementById('current-day');
+        const countdownListElement = document.getElementById('countdown-list');
+        const countdownTitleInput = document.getElementById('countdown-title');
+        const countdownDateInput = document.getElementById('countdown-date');
+        const addCountdownButton = document.getElementById('add-countdown');
+        const countdownSettingsListElement = document.getElementById('countdown-settings-list');
+
+        let countdowns = JSON.parse(localStorage.getItem('countdowns')) || [];
+
+        function updateMainDisplay() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            currentDateElement.textContent = now.toLocaleDateString('en-US', options);
+            currentDayElement.textContent = now.toLocaleDateString('en-US', { weekday: 'long' });
+        }
+
+        function renderCountdowns() {
+            countdownListElement.innerHTML = '';
+            countdowns.forEach(countdown => {
+                if (countdown.enabled) {
+                    const countdownItem = document.createElement('div');
+                    countdownItem.classList.add('countdown-item');
+
+                    const timeDiff = new Date(countdown.date) - new Date();
+                    const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+
+                    countdownItem.innerHTML = `
+                        <h3>${countdown.title}</h3>
+                        <p>${daysRemaining} days remaining</p>
+                    `;
+
+                    if (daysRemaining <= 1) {
+                        countdownItem.classList.add('flashing-red');
+                    } else if (daysRemaining <= 3) {
+                        countdownItem.classList.add('flashing-amber');
+                    } else if (daysRemaining <= 5) {
+                        countdownItem.classList.add('flashing-yellow');
+                    }
+
+                    countdownListElement.appendChild(countdownItem);
+                }
+            });
+        }
+
+        function renderSettings() {
+            countdownSettingsListElement.innerHTML = '';
+            countdowns.forEach((countdown, index) => {
+                const settingItem = document.createElement('div');
+                settingItem.innerHTML = `
+                    <input type="checkbox" id="enabled-${index}" ${countdown.enabled ? 'checked' : ''}>
+                    <input type="text" value="${countdown.title}" id="title-${index}">
+                    <input type="date" value="${countdown.date}" id="date-${index}">
+                    <button class="edit" data-index="${index}">Edit</button>
+                    <button class="remove" data-index="${index}">Remove</button>
+                `;
+                countdownSettingsListElement.appendChild(settingItem);
+            });
+        }
+
+        function addCountdown() {
+            const title = countdownTitleInput.value;
+            const date = countdownDateInput.value;
+            if (title && date) {
+                countdowns.push({ title, date, enabled: true });
+                localStorage.setItem('countdowns', JSON.stringify(countdowns));
+                renderCountdowns();
+                renderSettings();
+                countdownTitleInput.value = '';
+                countdownDateInput.value = '';
+            }
+        }
+
+        function editCountdown(index) {
+            const newTitle = document.getElementById(`title-${index}`).value;
+            const newDate = document.getElementById(`date-${index}`).value;
+            countdowns[index].title = newTitle;
+            countdowns[index].date = newDate;
+            localStorage.setItem('countdowns', JSON.stringify(countdowns));
+            renderCountdowns();
+            renderSettings();
+        }
+
+        function removeCountdown(index) {
+            countdowns.splice(index, 1);
+            localStorage.setItem('countdowns', JSON.stringify(countdowns));
+            renderCountdowns();
+            renderSettings();
+        }
+
+        function toggleCountdown(index) {
+            countdowns[index].enabled = !countdowns[index].enabled;
+            localStorage.setItem('countdowns', JSON.stringify(countdowns));
+            renderCountdowns();
+            renderSettings();
+        }
+
+        addCountdownButton.addEventListener('click', addCountdown);
+
+        countdownSettingsListElement.addEventListener('click', e => {
+            if (e.target.classList.contains('edit')) {
+                const index = e.target.dataset.index;
+                editCountdown(index);
+            } else if (e.target.classList.contains('remove')) {
+                const index = e.target.dataset.index;
+                removeCountdown(index);
+            }
+        });
+
+        countdownSettingsListElement.addEventListener('change', e => {
+            if (e.target.type === 'checkbox') {
+                const index = e.target.id.split('-')[1];
+                toggleCountdown(index);
+            }
+        });
+
+        updateMainDisplay();
+        renderCountdowns();
+        renderSettings();
+        setInterval(updateMainDisplay, 1000);
+    </script>
+</body>
+</html>
